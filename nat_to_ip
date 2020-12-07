@@ -1,0 +1,21 @@
+#!/bin/bash
+#Change the Package variable below to be the name of the policy package
+PACKAGE="Policy_Package_Name"
+
+# Login Read Only - Update with creds for your mgmt server
+SID=$(mgmt_cli -r true login read-only true --format json |jq -r '.sid')
+#SID=$(mgmt_cli -r true login domain "CMA3" read-only true --format json |jq -r '.sid')
+
+# Grab the JSON data from the Policy Package via API - note only 500 rule are pulled
+JSON=$(mgmt_cli show-nat-rulebase package $PACKAGE limit 500 use-object-dictionary false -f json --session-id $SID  |jq -r '.rulebase[].rulebase[]')
+
+# Create header line for csv file
+echo "nat_rule_num, original_source_type, original_source_name, original_source_ip_info, original_destination_type, original_destination_name, original_destination_ip_info, translated_source_type, translated_source_name, translated_source_ip_info, translated_destination_type, translated_destination_name, translated_destination_ip_info" > nat_to_ip.csv
+
+# Pass JSON through JQ to get the CSV output.  Note only hosts, ip-ranges, networks have their IP addresses output
+#
+echo $JSON |jq -r ' [."rule-number", ."original-source".type, ."original-source".name, (if ."original-source".type == "host" then ."original-source"."ipv4-address" elif ."original-source".type == "address-range" then ."original-source"."ipv4-address-first" + "-" + ."original-source"."ipv4-address-last" elif ."original-source".type == "network" then ."original-source".subnet4 + "/" + (."original-source"."mask-length4" |tostring) else ."original-source".name end), ."original-destination".type, ."original-destination".name, (if ."original-destination".type == "host" then ."original-destination"."ipv4-address" elif ."original-destination".type == "address-range" then ."original-destination"."ipv4-address-first" + "-" + ."original-destination"."ipv4-address-last" elif ."original-destination".type == "network" then ."original-destination".subnet4 + "/" + (."original-destination"."mask-length4" |tostring) else ."original-destination".name end), ."translated-source".type, ."translated-source".name, (if ."translated-source".type == "host" then ."translated-source"."ipv4-address" elif ."translated-source".type == "address-range" then ."translated-source"."ipv4-address-first" + "-" + ."translated-source"."ipv4-address-last" elif ."translated-source".type == "network" then ."translated-source".subnet4 + "/" + (."translated-source"."mask-length4" | tostring) else ."translated-source".name end), ."translated-destination".type, ."translated-destination".name, (if ."translated-destination".type == "host" then ."translated-destination"."ipv4-address" elif ."translated-destination".type == "address-range" then ."translated-destination"."ipv4-address-first" + "-" + ."translated-destination"."ipv4-address-last" elif ."translated-destination".type == "network" then ."translated-destination".subnet4 + "/" + (."translated-destination"."mask-length4" | tostring) else ."translated-destination".name end) ] | @csv' >> nat_to_ip.csv
+
+echo "File nat_to_ip.csv was created"
+echo "Logging Out"
+mgmt_cli logout --session-id $SID
