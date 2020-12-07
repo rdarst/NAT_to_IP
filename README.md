@@ -1,5 +1,5 @@
 # NAT_to_IP
-Simple script to output IP addresses for NAT Rulebase for a Check Point R8X NAT Rulebase
+Simple bash script to output IP addresses for the NAT Rulebase for a Check Point R8X Mgmt Server
 
 To use the script place it on your management server and adjust the PACKAGE variable to match the policy package you would
 like to get the NAT rulebase information to IP address.
