@@ -4,6 +4,15 @@ Simple bash script to output IP addresses for the NAT Rulebase for a Check Point
 To use the script place it on your management server and adjust the PACKAGE variable to match the policy package you would
 like to get the NAT rulebase information to IP address.
 
+## Example run
+
+```
+[Expert@MDS1:0]# bash nat_to_ip
+File nat_to_ip.csv was created
+Logging Out
+message: "OK"
+```
+
 ## By default this script will only output the first 500 NAT rules in the NAT Rulebase.
 
 Since the NAT policy contains many object types that may not include ip addresses (groups, roles, Domain Objects, Dynamic Objects, etc)
