@@ -18,8 +18,12 @@ message: "OK"
 Since the NAT policy contains many object types that may not include ip addresses (groups, roles, Domain Objects, Dynamic Objects, etc)
 the output will only include the names of these object types.
 
-For Hosts (192.168.1.1), Networks (192.168.1.0/24) and ip-ranges (192.168.1.1-192.168.1.100) 
-will be output as ip's using their format as just described.
+Output Examples for specific object types in the CSV output
+```
+Hosts 192.168.1.1 
+Networks 192.168.1.0/24 
+IP-Ranges 192.168.1.1-192.168.1.100
+```
 
 ## Example csv file created: 
 ```
